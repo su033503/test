@@ -4,8 +4,9 @@
 
 typedef struct TreeNode {
 	int weight;
-	char *strval;
-	char *bitcode;
+test
+test
+test
 	struct TreeNode *left_child;
 	struct TreeNode *right_child;
 } TreeNode;
