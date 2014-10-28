@@ -1,0 +1,259 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct TreeNode {
+	int weight;
+	char *strval;
+	char *bitcode;
+	struct TreeNode *left_child;
+	struct TreeNode *right_child;
+} TreeNode;
+typedef struct {
+	TreeNode *ptree;
+	int key;
+	char *value;
+} element;
+typedef struct {
+	element *heap;
+	int heap_size;
+} HeapType;
+
+typedef struct {
+	char*En;
+	char*Code;
+} ChangeStr;
+
+void init(HeapType *h){
+	h->heap_size=0;
+}
+
+void insert_min_heap(HeapType *h, element item) {
+	int i;
+	i=++(h->heap_size);
+
+	while((i!=1)&&(item.key<h->heap[i/2].key)) {
+		h->heap[i] = h->heap[i/2];
+		i/=2;
+	}
+	h->heap[i]=item;
+}
+
+
+element delete_min_heap(HeapType *h) {
+	int parent, child;
+	element item, temp;
+
+	item=h->heap[1];
+	temp=h->heap[(h->heap_size)--];
+	parent = 1;
+	child = 2;
+	while (child <= h->heap_size ){
+		if( (child < h->heap_size )&&(h->heap[child].key)>h->heap[child+1].key)
+			child ++;
+		if( temp.key <= h->heap[child].key) break;
+		h->heap[parent]=h->heap[child];
+		parent=child;
+		child *=2;
+	}
+	h->heap[parent] = temp;
+	return item;
+}
+
+TreeNode *make_tree(TreeNode *left, TreeNode *right) {
+	TreeNode *node=(TreeNode*)malloc(sizeof(TreeNode));
+	if( node == NULL ) {
+		fprintf(stderr,"메모리 에러\n");
+		exit(1);
+	}
+	node->left_child=left;
+	node->right_child=right;
+	return node;
+}
+
+void destroy_tree(TreeNode *root) {
+	if (root==NULL) return;
+	destroy_tree(root->left_child);
+	destroy_tree(root->right_child);
+	free(root);
+}
+
+void change_string(TreeNode* r, int num, ChangeStr f) {
+	
+	int i=0, length;
+
+	char str1[100]={};
+	char str2[100]={};
+	char *stradd;
+	
+	if(r){
+		change_string(r->left_child, num,f);
+		change_string(r->right_child, num,f);
+	if(r->left_child==NULL || r->right_child==NULL){
+		
+		f.En[i]=r->strval[0];
+		f.Code[i]=*r->bitcode;
+		i++;
+		printf("%c ",*f.En);
+	}
+	/*printf("바꿀 문자열 입력 : ");
+	scanf("%s",str1);
+	length=strlen(str1);
+	for ( i=0; i<length; i++) {
+		str1[i];r.strval[0];
+		}*/
+	}
+	
+}
+//코드 생성
+void print_tree(TreeNode*r,int n,char* code) {
+	int m=0;
+	if(r){
+		n++;
+		code[n]='1';
+		print_tree(r->left_child,n,code);
+		code[n]='0';
+		print_tree(r->right_child,n,code);
+		code[n]='\0';
+		if(r->left_child==NULL || r->right_child==NULL){
+			printf("	-%c %d\t=%s\n",r->strval[0],r->weight,code);
+			r->bitcode=code;
+			printf("%s",r->bitcode);
+		}
+	}
+
+}
+
+
+//트리 중위순회 출력
+void inorder(TreeNode *root){
+	int i;
+	if(root){
+		inorder(root->left_child);
+		for( i=0; i<4; i++) {	//출력시 a, w+i 처럼 문자열 길이가 다르므로 null을 만날경우 바로 출력문을 빠져나오게 설정
+			printf("%c",root->strval[i]);
+			if(root->strval[i] == NULL)
+				break;
+			
+		}
+		inorder(root->right_child);
+	}
+
+}
+//힙 중위순회 출력
+void heap_inorder( HeapType c, int num, int size)
+{	
+	int i;
+	if(num<=size) {
+		heap_inorder(c,num*2,size);
+		for( i=0; i<4; i++) {	//출력시 a, w+i 처럼 문자열 길이가 다르므로 null을 만날경우 바로 출력문을 빠져나오게 설정
+			if(c.heap[num].value[i] == NULL)
+				break;
+			printf("%c",c.heap[num].value[i]);
+		}
+		heap_inorder(c,num*2+1,size);
+	}
+	
+}
+
+void huffman_tree( int freq[], char str[], int n) {
+	int i,j;char *t, *plusN, *stdr;  
+	TreeNode *node, *x;
+	HeapType heap;
+	element *e, e1, e2,fe ,*e3;
+	ChangeStr f;
+	char*En;
+	char*Code;
+	f.En=(char*)malloc(sizeof(char)*n+1);
+	f.Code=(char*)malloc(sizeof(char)*n+1);
+	heap.heap=(element *)malloc(sizeof(element)*(n+1));
+	e=(element*)malloc(sizeof(element)*(n+1));
+	e3=(element*)malloc(sizeof(element)*(n+1));
+	for (i=0; i<n; i++) {
+		e[i].value=(char*)malloc(sizeof(char)*4+(n/10));
+		e3[i].value=(char*)malloc(sizeof(char)*4+(n/10));
+		for(j=0; j<4+(n/10); j++) { //element e.value 배열 초기화
+				e[i].value[j]=0;
+				e3[i].value[j]=0;
+		}
+	}
+	plusN=(char*)malloc(sizeof(char)*n+20);
+	strcpy(plusN,"w+");
+
+	t=(char*)malloc(sizeof(char)*n);
+	char*code=(char*)malloc(sizeof(char)*n);
+	init(&heap);
+
+	
+	printf("1. heap에 값이 추가될때 마다 중위순회 결과 출력\n");
+	for (i=0; i<n; i++) {
+		
+		node = make_tree(NULL,NULL);
+		
+		node->strval=(char*)malloc(sizeof(char)*4+(i/10));
+		for(j=0; j<4+(n/10); j++)     //TreeNode strval 배열 초기화
+			node->strval[j]=0;
+		
+		
+		e[i].value[0] =node->strval[0]=str[i];
+		printf("%c",e[i].value[0]);
+		e[i].key = node->weight = freq[i];
+		e[i].ptree = node;
+		insert_min_heap(&heap, e[i]);
+		printf("	");
+		heap_inorder(heap,1,heap.heap_size);
+		printf("\n");
+
+	}	
+
+	printf("2. 허프만코드 생성시 heap와 생성되는 허프만트리 중위순회 결과 출력\n");
+	printf("    heap중위순회	    허프만트리 중위순회\n");
+	for (i=1; i<n; i++) {
+		
+		itoa(i,t,10);	//i값에 맞춰서 itoa로 정수 i를 문자열 t로 치환		
+		strcat(plusN,t);	//t를 plusN뒤에 붙여서 w+i 문자열을 생성	 
+		e1=delete_min_heap(&heap);
+		e2=delete_min_heap(&heap);
+		x=make_tree(e1.ptree, e2.ptree);
+		
+		e3[i].key = x->weight = e1.key + e2.key;
+		x->strval=(char*)malloc(sizeof(char)*4+(i/10));
+		for( j=0; j<4+(i/10); j++)
+			e3[i].value[j]=x->strval[j]=plusN[j];
+			
+		e3[i].ptree= x;
+		printf("	");
+		heap_inorder(heap,1,heap.heap_size);
+		printf("			");
+		inorder( x );
+		printf("\n");
+		
+		insert_min_heap(&heap, e3[i]);
+
+		printf("	");
+		heap_inorder(heap,1,heap.heap_size);
+		printf("\n");
+		strcpy(plusN,"w+");
+		
+	}
+	
+	fe= delete_min_heap(&heap);
+	printf("3. 코드생성\n");
+	print_tree(fe.ptree,-1,code);
+
+	printf("4. 문자열 변경\n");
+
+	change_string(fe.ptree,n,f);
+	free(code);
+	free(t);
+	free(plusN);
+	free(node->strval);
+	free(x->strval);
+	free(heap.heap);
+	free(e);
+	free(e3);
+	for(i=0;i<n ; i++) {
+		printf("%c ",*(f.En-2*i));
+	}
+	destroy_tree(fe.ptree);
+}
